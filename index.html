@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataFlow AI - Analytics for Modern Business</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: #10b981;
+        }
+
+        .cta-btn {
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 5% 4rem;
+            position: relative;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #fff, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #9ca3af;
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            transform: translateY(-3px);
+        }
+
+        .section {
+            padding: 6rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s;
+        }
+
+        .section-header.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #9ca3af;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .service-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: #10b981;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #10b981;
+        }
+
+        .service-card p {
+            color: #9ca3af;
+            line-height: 1.8;
+        }
+
+        .stats-section {
+            background: rgba(16, 185, 129, 0.05);
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.6s;
+        }
+
+        .stat-item.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #9ca3af;
+        }
+
+        .value-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .value-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.219);
+            border-radius: 16px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.6s;
+        }
+
+        .value-card.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .value-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #10b981;
+        }
+
+        .value-card p {
+            color: #9ca3af;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .value-image {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.6s;
+        }
+
+        .value-image.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 250px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 2rem;
+            gap: 1rem;
+        }
+
+        .chart-bar {
+            background: linear-gradient(to top, #10b981, #059669);
+            border-radius: 8px 8px 0 0;
+            flex: 1;
+            animation: growBar 1s ease-out forwards;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+
+        @keyframes growBar {
+            to { transform: scaleY(1); }
+        }
+
+        .chart-bar:nth-child(1) { height: 60%; animation-delay: 0.1s; }
+        .chart-bar:nth-child(2) { height: 85%; animation-delay: 0.2s; }
+        .chart-bar:nth-child(3) { height: 70%; animation-delay: 0.3s; }
+        .chart-bar:nth-child(4) { height: 95%; animation-delay: 0.4s; }
+        .chart-bar:nth-child(5) { height: 75%; animation-delay: 0.5s; }
+
+        .cta-section {
+            text-align: center;
+            padding: 6rem 5%;
+            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.1), transparent 70%);
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s;
+        }
+
+        .cta-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-content p {
+            font-size: 1.2rem;
+            color: #9ca3af;
+            margin-bottom: 2.5rem;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 4rem 5% 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h4 {
+            color: #10b981;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #10b981;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(16, 185, 129, 0.1);
+            color: #6b7280;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+        }
+        .logo {
+    display: flex;
+    align-items: center; /* vertical alignment */
+    gap: 10px; /* logo এবং নামের মধ্যে space */
+}
+
+.logo-img {
+    width: 40px;   /* প্রয়োজন অনুযায়ী adjust করো */
+    height: 40px;
+    object-fit: contain; /* image distortion এড়াবে */
+}
+.highlight {
+    color: #36ff33d7; /* তোমার পছন্দের রঙ দিয়ে চেঞ্জ করো */
+    font-weight: bold; /* চাইলে emphasis দিতে */
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    
+    <div class="content-wrapper">
+        <nav>
+            <div class="logo">
+                <div class="logo">
+    <img src="logo.png" alt="DataFirm Logo" class="logo-img">
+ 
+</div>
+
+                <div class="logo"></div>
+               <span>Data<span class="highlight">Firm</span></span>
+
+            </div>
+            <ul class="nav-links">
+                <li><a href="#services">Services</a></li>
+                <li><a href="#insights">Insights</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="cta-btn">Get Started</button>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-content">
+                <h1>Transform Data Into Growth</h1>
+                <p>Advanced AI-powered analytics for restaurants and e-commerce. Make data-driven decisions that increase revenue, optimize operations, and accelerate growth.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary">Start Free Trial</button>
+                    <button class="btn-secondary">Watch Demo</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="services">
+            <div class="section-header">
+                <h2>Powerful Analytics Solutions</h2>
+                <p>Everything you need to understand your business, predict trends, and make intelligent decisions</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🍽️</div>
+                    <h3>Restaurant Analytics</h3>
+                    <p>Track menu performance, peak hours, customer preferences, and inventory optimization. Get real-time insights to reduce waste and increase profitability.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🛒</div>
+                    <h3>E-commerce Analytics</h3>
+                    <p>Monitor conversion rates, customer behavior, abandoned carts, and product performance. Optimize your funnel and boost revenue.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📈</div>
+                    <h3>Custom Dashboards</h3>
+                    <p>Beautiful, intuitive dashboards tailored to your business. Access your data anywhere, anytime with real-time updates.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">💡</div>
+                    <h3>Predictive Insights</h3>
+                    <p>AI-powered forecasting helps you anticipate demand, optimize inventory, and stay ahead of market trends.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">37%</div>
+                    <div class="stat-label">Average Revenue Increase</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2.4x</div>
+                    <div class="stat-label">ROI Within 6 Months</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Real-Time Monitoring</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Businesses Transformed</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="insights">
+            <div class="section-header">
+                <h2>Data That Drives Decisions</h2>
+                <p>See how businesses like yours are using our platform to unlock growth</p>
+            </div>
+            <div class="value-section">
+                <div class="value-card">
+                    <h3>Restaurant Success Story</h3>
+                    <p>A local restaurant chain increased revenue by 42% in 3 months by identifying peak hours, optimizing menu pricing, and reducing food waste by 35%.</p>
+                    <p>Our AI detected that certain items were underpriced compared to demand, and suggested optimal pricing strategies that customers accepted.</p>
+                    <p><strong style="color: #10b981;">Result:</strong> $180K additional annual revenue with the same customer base.</p>
+                </div>
+                <div class="value-image">
+                    <div class="chart-placeholder">
+                        <div class="chart-bar"></div>
+                        <div class="chart-bar"></div>
+                        <div class="chart-bar"></div>
+                        <div class="chart-bar"></div>
+                        <div class="chart-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="value-section" style="flex-direction: row-reverse;">
+                <div class="value-card">
+                    <h3>E-commerce Breakthrough</h3>
+                    <p>An online fashion retailer reduced cart abandonment by 58% using our behavioral analytics and automated email recovery campaigns.</p>
+                    <p>We identified that 67% of cart abandonments happened at the shipping cost page, leading to a free shipping threshold that increased conversions.</p>
+                    <p><strong style="color: #10b981;">Result:</strong> 2.3x increase in completed purchases within 60 days.</p>
+                </div>
+                <div class="value-image">
+                    <div style="text-align: center; color: #10b981;">
+                        <div style="font-size: 5rem; font-weight: 800; margin-bottom: 1rem;">58%</div>
+                        <div style="font-size: 1.3rem; color: #9ca3af;">Reduction in Cart Abandonment</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section" id="contact">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Business?</h2>
+                <p>Join hundreds of restaurants and e-commerce businesses already growing with DataFlow AI. Start your 14-day free trial today—no credit card required.</p>
+                <button class="btn-primary" style="font-size: 1.2rem; padding: 1.2rem 3rem;">Start Free Trial</button>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DataFlow AI</h4>
+                    <p style="color: #9ca3af;">Advanced analytics for modern businesses. Make smarter decisions with AI-powered insights.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Integrations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 DataFlow AI. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.section-header, .service-card, .stat-item, .value-card, .value-image, .cta-content');
+            elements.forEach(el => observer.observe(el));
+
+            // Smooth scroll for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // Add glow effect on mouse move
+            document.addEventListener('mousemove', (e) => {
+                const glow = document.querySelector('.hero-glow');
+                const x = e.clientX;
+                const y = e.clientY;
+                glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(16, 185, 129, 0.15), transparent 70%)`;
+            });
+        });
+    </script>
+    
+</body>
+</html>
